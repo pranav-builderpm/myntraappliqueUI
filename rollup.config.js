@@ -67,7 +67,8 @@ const config = {
       modules: {
         generateScopedName(name, filename, css) {
           const component = filename
-            .replace(componentsDir + '/', '')
+            .replace(/\\/g, '/')
+            .replace(componentsDir.replace(/\\/g, '/') + '/', '')
             .split('/')
             .shift()
 
