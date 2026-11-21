@@ -1,2 +1,4 @@
 __codemod__/**/*.js
 **/*/__codemod__/**/*.js
+
+pm-shorts

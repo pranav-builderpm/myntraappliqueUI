@@ -4,3 +4,4 @@ dist
 **/*/__codemod__/**/*.js
 __codemod__/**/*.js
 tools
+pm-shorts
