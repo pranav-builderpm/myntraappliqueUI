@@ -460,16 +460,26 @@
       case 'share': {
         var c = CARD[t.closest('.card').dataset.id]
         var text = c.headline + '\n' + c.summary + '\n' + c.url
-        if (navigator.share) navigator.share({ title: c.headline, text: c.summary, url: c.url }).catch(function () {})
-        else if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { toast('Copied to clipboard') }, function () { toast('Could not copy') })
-        else toast('Sharing not supported here')
+        var copy = function () {
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { toast('Copied to clipboard') }, function () { toast('Could not copy') })
+          else toast('Sharing is not supported here')
+        }
+        if (navigator.share) navigator.share({ title: c.headline, text: c.summary, url: c.url }).catch(function (err) { if (!err || err.name !== 'AbortError') copy() })
+        else copy()
         break
       }
       case 'open': S.opens++; save(); break // let the link open
       case 'clearfilter': filter = null; renderFeed(); break
       case 'redo': startOnb(); break
       case 'reset':
-        if (window.confirm('Reset your answers, streak and saved shorts on this device?')) { try { localStorage.removeItem(KEY) } catch (x) {} S = defaults(); applyTheme(); filter = null; startOnb(); $('#app-main').hidden = true }
+        // In-page two-tap confirmation (window.confirm is unavailable in some hosts).
+        if (t.dataset.armed !== '1') {
+          t.dataset.armed = '1'; t.textContent = 'Tap again to erase everything'
+          setTimeout(function () { t.dataset.armed = ''; t.innerHTML = 'Reset progress &amp; answers' }, 4000)
+        } else {
+          try { localStorage.removeItem(KEY) } catch (x) {}
+          S = defaults(); applyTheme(); filter = null; feed = []; startOnb(); $('#app-main').hidden = true
+        }
         break
     }
   })
